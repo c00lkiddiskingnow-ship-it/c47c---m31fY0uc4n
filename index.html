@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>c47c|-|m31fY0uc4n</title>
+    <style>
+        body {
+            background-color: #030813;
+            color: #00f3ff;
+            font-family: 'Courier New', Courier, monospace;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-shadow: 0 0 10px #00f3ff, 0 0 20px #00f3ff;
+            text-transform: lowercase;
+        }
+
+        .char {
+            display: inline-block;
+        }
+
+        .char.resolved {
+            color: #ffffff;
+            text-shadow: 0 0 10px #00f3ff;
+        }
+
+        .prompt {
+            position: absolute;
+            bottom: 30px;
+            font-size: 0.8rem;
+            color: rgba(0, 243, 255, 0.4);
+            letter-spacing: 2px;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1 id="hacker-text"></h1>
+    <div class="prompt" id="prompt">click anywhere to enable audio & start</div>
+
+    <!-- Your downloaded wav file -->
+    <audio id="tts-audio" src="whisper.wav" preload="auto"></audio>
+
+    <script>
+        const targetString = "c47c|-|m31fY0uc4n";
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*|/-_";
+        const container = document.getElementById("hacker-text");
+        const promptEl = document.getElementById("prompt");
+        const ttsAudio = document.getElementById("tts-audio");
+
+        let audioCtx = null;
+        let animationStarted = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playGlitchSound() {
+            if (!audioCtx) return;
+            try {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100 + Math.random() * 400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.04);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.04);
+            } catch (e) {}
+        }
+
+        function playDingSound() {
+            if (!audioCtx) return;
+            try {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(2400, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            } catch (e) {}
+        }
+
+        targetString.split('').forEach(() => {
+            const span = document.createElement('span');
+            span.className = 'char';
+            span.textContent = chars[Math.floor(Math.random() * chars.length)];
+            container.appendChild(span);
+        });
+
+        const charSpans = container.querySelectorAll('.char');
+
+        function startHackerAnimation() {
+            if (animationStarted) return;
+            animationStarted = true;
+            promptEl.style.display = 'none';
+
+            initAudio();
+            let currentIndex = 0;
+            
+            const interval = setInterval(() => {
+                playGlitchSound();
+
+                for (let i = currentIndex; i < targetString.length; i++) {
+                    charSpans[i].textContent = chars[Math.floor(Math.random() * chars.length)];
+                }
+
+                if (currentIndex < targetString.length) {
+                    charSpans[currentIndex].textContent = targetString[currentIndex];
+                    charSpans[currentIndex].classList.add('resolved');
+                    playDingSound();
+                    currentIndex++;
+                } else {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        ttsAudio.play().catch(e => console.log("Audio play blocked:", e));
+                    }, 200);
+                }
+            }, 80);
+        }
+
+        window.addEventListener('click', startHackerAnimation);
+    </script>
+</body>
+</html>
